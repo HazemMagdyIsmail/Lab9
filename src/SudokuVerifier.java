@@ -56,16 +56,18 @@ public class SudokuVerifier {
         }
     }
 
-    private void print(List<DuplicateInfo> list,String type){
-        for(DuplicateInfo d:list){
-            if(d.type.equals(type)){
-                System.out.print(type+" "+d.index+", #"+d.value+", [");
-                for(int i=0;i<9;i++){
-                    System.out.print((i+1));
-                    if(i<8) System.out.print(", ");
-                }
-                System.out.println("]");
+  private void print(List<DuplicateInfo> list, String type) {
+    for (DuplicateInfo d : list) {
+        if (d.type.equals(type)) {
+            System.out.print(type + " " + d.index + ", #" + d.value + ", [");
+            for (int i = 0; i < d.positions.length; i++) {
+                System.out.print(d.positions[i]);
+                if (i < d.positions.length - 1) System.out.print(", ");
             }
+            System.out.println("]");
         }
     }
+}
+
+
 }
