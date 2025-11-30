@@ -11,29 +11,29 @@ public class VerifierEngine {
 
     public List<DuplicateInfo> verify(int mode) throws InterruptedException {
         List<DuplicateInfo> duplicates = Collections.synchronizedList(new ArrayList<>());
-        int[][] grid = board.getGrid();
+        
         List<Thread> threads = new ArrayList<>();
 
         if (mode == 0) {
             // Sequential validation
             for (int i = 0; i < 9; i++) {
-                ValidatorFactory.createRowValidator(grid, duplicates, i).run();
-                ValidatorFactory.createColValidator(grid, duplicates, i).run();
-                ValidatorFactory.createBoxValidator(grid, duplicates, i).run();
+                ValidatorFactory.createRowValidator(board, duplicates, i).run();
+                ValidatorFactory.createColValidator(board, duplicates, i).run();
+                ValidatorFactory.createBoxValidator(board, duplicates, i).run();
             }
         } else if (mode == 3) {
             // Three threads: one for rows, one for cols, one for boxes
             Thread rowThread = new Thread(() -> {
                 for (int i = 0; i < 9; i++)
-                    ValidatorFactory.createRowValidator(grid, duplicates, i).run();
+                    ValidatorFactory.createRowValidator(board, duplicates, i).run();
             });
             Thread colThread = new Thread(() -> {
                 for (int i = 0; i < 9; i++)
-                    ValidatorFactory.createColValidator(grid, duplicates, i).run();
+                    ValidatorFactory.createColValidator(board, duplicates, i).run();
             });
             Thread boxThread = new Thread(() -> {
                 for (int i = 0; i < 9; i++)
-                    ValidatorFactory.createBoxValidator(grid, duplicates, i).run();
+                    ValidatorFactory.createBoxValidator(board, duplicates, i).run();
             });
 
             threads.add(rowThread);
@@ -46,9 +46,9 @@ public class VerifierEngine {
         } else if (mode == 27) {
             // 27 threads: one per row, col, box validator
             for (int i = 0; i < 9; i++) {
-                threads.add(new Thread(ValidatorFactory.createRowValidator(grid, duplicates, i)));
-                threads.add(new Thread(ValidatorFactory.createColValidator(grid, duplicates, i)));
-                threads.add(new Thread(ValidatorFactory.createBoxValidator(grid, duplicates, i)));
+                threads.add(new Thread(ValidatorFactory.createRowValidator(board, duplicates, i)));
+                threads.add(new Thread(ValidatorFactory.createColValidator(board, duplicates, i)));
+                threads.add(new Thread(ValidatorFactory.createBoxValidator(board, duplicates, i)));
             }
 
             for (Thread t : threads) t.start();

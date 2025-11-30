@@ -1,18 +1,18 @@
 public class DuplicateInfo {
-    private  String type;     // "ROW", "COL", or "BOX"
-    private  int index;       // 1-based index of the row/col/box
-    private  int value;       // duplicated value
-    private  int[] positions; // positions of duplicates within the region (1-based)
+    private final RegionType regionType;
+    private final int index;      // 1-based index of region
+    private final int value;      // duplicated value
+    private final int[] positions; // 1-based positions of duplicates in region
 
-    public DuplicateInfo(String type, int index, int value, int[] positions) {
-        this.type = type;
+    public DuplicateInfo(RegionType regionType, int index, int value, int[] positions) {
+        this.regionType = regionType;
         this.index = index;
         this.value = value;
         this.positions = positions;
     }
 
-    public String getType() {
-        return type;
+    public RegionType getRegionType() {
+        return regionType;
     }
 
     public int getIndex() {

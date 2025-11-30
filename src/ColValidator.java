@@ -1,11 +1,11 @@
 import java.util.*;
 
-public class ColValidator implements Validator  {
-    private final int[][] board;
+public class ColValidator implements Validator {
+    private final SudokuBoard board;
     private final List<DuplicateInfo> dups;
-    private final int col;  // 0-based
+    private final int col;
 
-    public ColValidator(int[][] board, List<DuplicateInfo> dups, int col) {
+    public ColValidator(SudokuBoard board, List<DuplicateInfo> dups, int col) {
         this.board = board;
         this.dups = dups;
         this.col = col;
@@ -17,9 +17,10 @@ public class ColValidator implements Validator  {
     }
 
     public void validate() {
+        int[][] grid = board.getGrid();
         Map<Integer, List<Integer>> positions = new HashMap<>();
         for (int r = 0; r < 9; r++) {
-            int val = board[r][col];
+            int val = grid[r][col];
             if (val == 0) continue;
             positions.computeIfAbsent(val, k -> new ArrayList<>()).add(r + 1);
         }
@@ -29,7 +30,7 @@ public class ColValidator implements Validator  {
             if (posList.size() > 1) {
                 int[] posArray = posList.stream().mapToInt(Integer::intValue).toArray();
                 synchronized (dups) {
-                    dups.add(new DuplicateInfo("COL", col + 1, entry.getKey(), posArray));
+                    dups.add(new DuplicateInfo(RegionType.COL, col + 1, entry.getKey(), posArray));
                 }
             }
         }

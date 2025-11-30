@@ -1,11 +1,11 @@
 import java.util.*;
 
 public class BoxValidator implements Validator {
-    private final int[][] board;
+    private final SudokuBoard board;
     private final List<DuplicateInfo> dups;
-    private final int boxIndex; // 0-based box index (0..8)
+    private final int boxIndex;
 
-    public BoxValidator(int[][] board, List<DuplicateInfo> dups, int boxIndex) {
+    public BoxValidator(SudokuBoard board, List<DuplicateInfo> dups, int boxIndex) {
         this.board = board;
         this.dups = dups;
         this.boxIndex = boxIndex;
@@ -17,6 +17,7 @@ public class BoxValidator implements Validator {
     }
 
     public void validate() {
+        int[][] grid = board.getGrid();
         int boxRow = (boxIndex / 3) * 3;
         int boxCol = (boxIndex % 3) * 3;
         Map<Integer, List<Integer>> positions = new HashMap<>();
@@ -24,7 +25,7 @@ public class BoxValidator implements Validator {
 
         for (int r = boxRow; r < boxRow + 3; r++) {
             for (int c = boxCol; c < boxCol + 3; c++) {
-                int val = board[r][c];
+                int val = grid[r][c];
                 if (val == 0) {
                     pos++;
                     continue;
@@ -39,7 +40,7 @@ public class BoxValidator implements Validator {
             if (posList.size() > 1) {
                 int[] posArray = posList.stream().mapToInt(Integer::intValue).toArray();
                 synchronized (dups) {
-                    dups.add(new DuplicateInfo("BOX", boxIndex + 1, entry.getKey(), posArray));
+                    dups.add(new DuplicateInfo(RegionType.BOX, boxIndex + 1, entry.getKey(), posArray));
                 }
             }
         }
