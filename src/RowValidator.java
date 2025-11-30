@@ -2,7 +2,7 @@ import java.util.*;
 
 public class RowValidator implements Validator {
     private final int[][] board;
-    private final int row;
+    private final int row; // 0-based
 
     public RowValidator(int[][] board, int row) {
         this.board = board;
@@ -10,16 +10,11 @@ public class RowValidator implements Validator {
     }
 
     @Override
-    public List<ValidationResult> validate() {
+    public List<ValidationResult> call() {
         Map<Integer, List<Integer>> positions = new HashMap<>();
         for (int c = 0; c < 9; ++c) {
             int v = board[row][c];
-            List<Integer> posList = positions.get(v);
-            if (posList == null) {
-                posList = new ArrayList<>();
-                positions.put(v, posList);
-            }
-            posList.add(c + 1);
+            positions.computeIfAbsent(v, k -> new ArrayList<>()).add(c + 1); // columns 1-based
         }
         List<ValidationResult> res = new ArrayList<>();
         for (Map.Entry<Integer, List<Integer>> e : positions.entrySet()) {

@@ -1,5 +1,8 @@
+
+
 public class ValidatorFactory {
-    public static Validator createRowValidator(int[][] board, int rowIndex) {
+    // Creates validators for rows, cols, boxes
+    public static Validator  createRowValidator(int[][] board, int rowIndex) {
         return new RowValidator(board, rowIndex);
     }
 

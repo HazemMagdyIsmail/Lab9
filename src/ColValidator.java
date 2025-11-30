@@ -10,18 +10,12 @@ public class ColValidator implements Validator {
     }
 
     @Override
-    public List<ValidationResult> validate() {
+    public List<ValidationResult> call() {
         Map<Integer, List<Integer>> positions = new HashMap<>();
         for (int r = 0; r < 9; ++r) {
             int v = board[r][col];
-            List<Integer> posList = positions.get(v);
-            if (posList == null) {
-                posList = new ArrayList<>();
-                positions.put(v, posList);
-            }
-            posList.add(r + 1); // rows 1-based
+            positions.computeIfAbsent(v, k -> new ArrayList<>()).add(r + 1); // rows 1-based
         }
-
         List<ValidationResult> res = new ArrayList<>();
         for (Map.Entry<Integer, List<Integer>> e : positions.entrySet()) {
             if (e.getValue().size() > 1) {

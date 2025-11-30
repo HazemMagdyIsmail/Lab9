@@ -10,25 +10,19 @@ public class BoxValidator implements Validator {
     }
 
     @Override
-    public List<ValidationResult> validate() {
+    public List<ValidationResult> call() {
         int boxRow = (boxIndex / 3) * 3;
         int boxCol = (boxIndex % 3) * 3;
         Map<Integer, List<Integer>> positions = new HashMap<>();
-        int pos = 1; // positions inside box are 1..9 left-to-right top-to-bottom
-
+        // positions inside box are 1..9 left-to-right top-to-bottom
+        int pos = 1;
         for (int r = boxRow; r < boxRow + 3; ++r) {
             for (int c = boxCol; c < boxCol + 3; ++c) {
                 int v = board[r][c];
-                List<Integer> posList = positions.get(v);
-                if (posList == null) {
-                    posList = new ArrayList<>();
-                    positions.put(v, posList);
-                }
-                posList.add(pos);
+                positions.computeIfAbsent(v, k -> new ArrayList<>()).add(pos);
                 pos++;
             }
         }
-
         List<ValidationResult> res = new ArrayList<>();
         for (Map.Entry<Integer, List<Integer>> e : positions.entrySet()) {
             if (e.getValue().size() > 1) {
@@ -38,4 +32,3 @@ public class BoxValidator implements Validator {
         return res;
     }
 }
-
