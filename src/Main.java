@@ -22,7 +22,7 @@ public class Main {
             return;
         }
 
-        // Load board
+
         SudokuBoard board;
         try {
             board = new SudokuBoard(path);
@@ -31,7 +31,6 @@ public class Main {
             return;
         }
 
-        // Run validation
         SudokuVerifier verifier = new SudokuVerifier(board, mode);
 
         try {
