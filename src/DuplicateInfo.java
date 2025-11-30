@@ -1,6 +1,6 @@
 public class DuplicateInfo {
     private final RegionType regionType;
-    private final int index;      // 1-based index of region
+    private final int index; 
     private final int value; 
     private final int[] positions; 
 
