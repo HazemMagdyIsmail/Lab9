@@ -2,26 +2,37 @@ import java.util.*;
 
 public class RowValidator implements Validator {
     private final int[][] board;
-    private final int row; 
+    private final List<DuplicateInfo> dups;
+    private final int row;  // 0-based row index
 
-    public RowValidator(int[][] board, int row) {
+    public RowValidator(int[][] board, List<DuplicateInfo> dups, int row) {
         this.board = board;
+        this.dups = dups;
         this.row = row;
     }
 
     @Override
-    public List<ValidationResult> call() {
+    public void run() {
+        validate();
+    }
+
+    public void validate() {
         Map<Integer, List<Integer>> positions = new HashMap<>();
-        for (int c = 0; c < 9; ++c) {
-            int v = board[row][c];
-            positions.computeIfAbsent(v, k -> new ArrayList<>()).add(c + 1); 
+        for (int c = 0; c < 9; c++) {
+            int val = board[row][c];
+            if (val == 0) continue; // assuming 0 means empty cell, ignore
+
+            positions.computeIfAbsent(val, k -> new ArrayList<>()).add(c + 1);
         }
-        List<ValidationResult> res = new ArrayList<>();
-        for (Map.Entry<Integer, List<Integer>> e : positions.entrySet()) {
-            if (e.getValue().size() > 1) {
-                res.add(new ValidationResult(RegionType.ROW, row + 1, e.getKey(), e.getValue()));
+
+        for (Map.Entry<Integer, List<Integer>> entry : positions.entrySet()) {
+            List<Integer> posList = entry.getValue();
+            if (posList.size() > 1) {
+                int[] posArray = posList.stream().mapToInt(Integer::intValue).toArray();
+                synchronized (dups) {
+                    dups.add(new DuplicateInfo("ROW", row + 1, entry.getKey(), posArray));
+                }
             }
         }
-        return res;
     }
 }

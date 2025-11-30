@@ -2,33 +2,46 @@ import java.util.*;
 
 public class BoxValidator implements Validator {
     private final int[][] board;
-    private final int boxIndex; // 0-based (0..8), left-to-right top-to-bottom
+    private final List<DuplicateInfo> dups;
+    private final int boxIndex; // 0-based box index (0..8)
 
-    public BoxValidator(int[][] board, int boxIndex) {
+    public BoxValidator(int[][] board, List<DuplicateInfo> dups, int boxIndex) {
         this.board = board;
+        this.dups = dups;
         this.boxIndex = boxIndex;
     }
 
     @Override
-    public List<ValidationResult> call() {
+    public void run() {
+        validate();
+    }
+
+    public void validate() {
         int boxRow = (boxIndex / 3) * 3;
         int boxCol = (boxIndex % 3) * 3;
         Map<Integer, List<Integer>> positions = new HashMap<>();
-        // positions inside box are 1..9 left-to-right top-to-bottom
         int pos = 1;
-        for (int r = boxRow; r < boxRow + 3; ++r) {
-            for (int c = boxCol; c < boxCol + 3; ++c) {
-                int v = board[r][c];
-                positions.computeIfAbsent(v, k -> new ArrayList<>()).add(pos);
+
+        for (int r = boxRow; r < boxRow + 3; r++) {
+            for (int c = boxCol; c < boxCol + 3; c++) {
+                int val = board[r][c];
+                if (val == 0) {
+                    pos++;
+                    continue;
+                }
+                positions.computeIfAbsent(val, k -> new ArrayList<>()).add(pos);
                 pos++;
             }
         }
-        List<ValidationResult> res = new ArrayList<>();
-        for (Map.Entry<Integer, List<Integer>> e : positions.entrySet()) {
-            if (e.getValue().size() > 1) {
-                res.add(new ValidationResult(RegionType.BOX, boxIndex + 1, e.getKey(), e.getValue()));
+
+        for (Map.Entry<Integer, List<Integer>> entry : positions.entrySet()) {
+            List<Integer> posList = entry.getValue();
+            if (posList.size() > 1) {
+                int[] posArray = posList.stream().mapToInt(Integer::intValue).toArray();
+                synchronized (dups) {
+                    dups.add(new DuplicateInfo("BOX", boxIndex + 1, entry.getKey(), posArray));
+                }
             }
         }
-        return res;
     }
 }

@@ -1,27 +1,37 @@
 import java.util.*;
 
-public class ColValidator implements Validator {
+public class ColValidator implements Validator  {
     private final int[][] board;
-    private final int col; 
+    private final List<DuplicateInfo> dups;
+    private final int col;  // 0-based
 
-    public ColValidator(int[][] board, int col) {
+    public ColValidator(int[][] board, List<DuplicateInfo> dups, int col) {
         this.board = board;
+        this.dups = dups;
         this.col = col;
     }
 
     @Override
-    public List<ValidationResult> call() {
+    public void run() {
+        validate();
+    }
+
+    public void validate() {
         Map<Integer, List<Integer>> positions = new HashMap<>();
-        for (int r = 0; r < 9; ++r) {
-            int v = board[r][col];
-            positions.computeIfAbsent(v, k -> new ArrayList<>()).add(r + 1); 
+        for (int r = 0; r < 9; r++) {
+            int val = board[r][col];
+            if (val == 0) continue;
+            positions.computeIfAbsent(val, k -> new ArrayList<>()).add(r + 1);
         }
-        List<ValidationResult> res = new ArrayList<>();
-        for (Map.Entry<Integer, List<Integer>> e : positions.entrySet()) {
-            if (e.getValue().size() > 1) {
-                res.add(new ValidationResult(RegionType.COL, col + 1, e.getKey(), e.getValue()));
+
+        for (Map.Entry<Integer, List<Integer>> entry : positions.entrySet()) {
+            List<Integer> posList = entry.getValue();
+            if (posList.size() > 1) {
+                int[] posArray = posList.stream().mapToInt(Integer::intValue).toArray();
+                synchronized (dups) {
+                    dups.add(new DuplicateInfo("COL", col + 1, entry.getKey(), posArray));
+                }
             }
         }
-        return res;
     }
 }

@@ -1,16 +1,15 @@
-
+import java.util.List;
 
 public class ValidatorFactory {
-    // Creates validators for rows, cols, boxes
-    public static Validator  createRowValidator(int[][] board, int rowIndex) {
-        return new RowValidator(board, rowIndex);
+    public static Validator createRowValidator(int[][] board, List<DuplicateInfo> dups, int row) {
+        return new RowValidator(board, dups, row);
     }
 
-    public static Validator createColValidator(int[][] board, int colIndex) {
-        return new ColValidator(board, colIndex);
+    public static Validator createColValidator(int[][] board, List<DuplicateInfo> dups, int col) {
+        return new ColValidator(board, dups, col);
     }
 
-    public static Validator createBoxValidator(int[][] board, int boxIndex) {
-        return new BoxValidator(board, boxIndex);
+    public static Validator createBoxValidator(int[][] board, List<DuplicateInfo> dups, int box) {
+        return new BoxValidator(board, dups, box);
     }
 }

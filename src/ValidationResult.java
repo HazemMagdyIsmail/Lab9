@@ -1,3 +1,4 @@
+
 import java.util.*;
 
 public class ValidationResult {
@@ -13,10 +14,21 @@ public class ValidationResult {
         this.positions = positions;
     }
 
-    public RegionType getRegionType() { return regionType; }
-    public int getRegionIndex() { return regionIndex; }
-    public int getValue() { return value; }
-    public List<Integer> getPositions() { return positions; }
+    public RegionType getRegionType() {
+        return regionType;
+    }
+
+    public int getRegionIndex() {
+        return regionIndex;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public List<Integer> getPositions() {
+        return positions;
+    }
 
     // Format: "ROW 1, #1, [1, 2, 3, ...]"
     public String formatForOutput() {
@@ -32,7 +44,8 @@ public class ValidationResult {
         sb.append("[");
         for (int i = 0; i < positions.size(); ++i) {
             sb.append(positions.get(i));
-            if (i < positions.size() - 1) sb.append(", ");
+            if (i < positions.size() - 1)
+                sb.append(", ");
         }
         sb.append("]");
         return sb.toString();
