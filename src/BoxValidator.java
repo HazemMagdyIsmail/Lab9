@@ -1,47 +1,41 @@
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.List;
+public class BoxValidator implements Validator {
+    private final int[][] board;
+    private final int boxIndex; // 0-based (0..8), left-to-right top-to-bottom
 
-public class BoxValidator extends AbstractValidator {
-    private int boxIndex;
-
-    public BoxValidator(int[][] board, List<DuplicateInfo> list, int boxIndex) {
-        super(board, list);
+    public BoxValidator(int[][] board, int boxIndex) {
+        this.board = board;
         this.boxIndex = boxIndex;
     }
 
     @Override
-    public void validate() {
-        int[] freq = new int[10];
+    public List<ValidationResult> validate() {
+        int boxRow = (boxIndex / 3) * 3;
+        int boxCol = (boxIndex % 3) * 3;
+        Map<Integer, List<Integer>> positions = new HashMap<>();
+        int pos = 1; // positions inside box are 1..9 left-to-right top-to-bottom
 
-        // Calculate starting row and column of the box
-        int boxRowStart = (boxIndex / 3) * 3;
-        int boxColStart = (boxIndex % 3) * 3;
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                int v = board[boxRowStart + i][boxColStart + j];
-                freq[v]++;
-            }
-        }
-
-        for (int v = 1; v <= 9; v++) {
-            if (freq[v] > 1) {
-                List<Integer> duplicatePositions = new ArrayList<>();
-                int positionCounter = 1; // positions from 1 to 9 within the box
-
-                for (int i = 0; i < 3; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        if (board[boxRowStart + i][boxColStart + j] == v) {
-                            duplicatePositions.add(positionCounter);
-                        }
-                        positionCounter++;
-                    }
+        for (int r = boxRow; r < boxRow + 3; ++r) {
+            for (int c = boxCol; c < boxCol + 3; ++c) {
+                int v = board[r][c];
+                List<Integer> posList = positions.get(v);
+                if (posList == null) {
+                    posList = new ArrayList<>();
+                    positions.put(v, posList);
                 }
-
-                int[] positions = duplicatePositions.stream().mapToInt(Integer::intValue).toArray();
-                out.add(new DuplicateInfo("BOX", boxIndex + 1, v, positions));
+                posList.add(pos);
+                pos++;
             }
         }
+
+        List<ValidationResult> res = new ArrayList<>();
+        for (Map.Entry<Integer, List<Integer>> e : positions.entrySet()) {
+            if (e.getValue().size() > 1) {
+                res.add(new ValidationResult(RegionType.BOX, boxIndex + 1, e.getKey(), e.getValue()));
+            }
+        }
+        return res;
     }
 }
+

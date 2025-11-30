@@ -1,73 +1,77 @@
-
-import java.util.*;
+import java.util.List;
 
 public class SudokuVerifier {
-    private SudokuBoard board;
-    private int mode;
-
-    public SudokuVerifier(SudokuBoard b, int m){
-        board=b; mode=m;
-    }
-
-    public void runValidation() throws Exception {
-        List<DuplicateInfo> dups = Collections.synchronizedList(new ArrayList<>());
-
-        int[][] g = board.getGrid();
-
-        List<Thread> threads = new ArrayList<>();
-
-        if(mode==0){
-            for(int i=0;i<9;i++) new RowValidator(g,dups,i).validate();
-            for(int i=0;i<9;i++) new ColumnValidator(g,dups,i).validate();
-            for(int i=0;i<9;i++) new BoxValidator(g,dups,i).validate();
-        }
-        else if(mode==3){
-            Thread t1=new Thread(()->{
-                for(int i=0;i<9;i++) new RowValidator(g,dups,i).validate();
-            });
-            Thread t2=new Thread(()->{
-                for(int i=0;i<9;i++) new ColumnValidator(g,dups,i).validate();
-            });
-            Thread t3=new Thread(()->{
-                for(int i=0;i<9;i++) new BoxValidator(g,dups,i).validate();
-            });
-            threads.add(t1); threads.add(t2); threads.add(t3);
-            for(Thread t:threads)t.start();
-            for(Thread t:threads)t.join();
-        }
-        else if(mode==27){
-            for(int i=0;i<9;i++) threads.add(new Thread(new RowValidator(g,dups,i)));
-            for(int i=0;i<9;i++) threads.add(new Thread(new ColumnValidator(g,dups,i)));
-            for(int i=0;i<9;i++) threads.add(new Thread(new BoxValidator(g,dups,i)));
-
-            for(Thread t:threads)t.start();
-            for(Thread t:threads)t.join();
+    public static void main(String[] args) {
+        if (args.length != 2) {
+            System.err.println("Usage: java -jar SudokuVerifier.jar <csv-file> <mode>");
+            System.err.println("mode: 0");
+            System.exit(1);
         }
 
-        if(dups.isEmpty()){
+        String path = args[0];
+        String modeStr = args[1];
+        int mode;
+        try {
+            mode = Integer.parseInt(modeStr);
+            if (mode != 0) {
+                System.err.println("Only mode 0 is supported without concurrency");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            System.err.println("Mode must be 0");
+            return;
+        }
+
+        int[][] board;
+        try {
+            board = CSVReader.readBoard(path);
+        } catch (Exception ex) {
+            System.err.println("Failed to read file: " + ex.getMessage());
+            return;
+        }
+
+        VerifierEngine engine = new VerifierEngine(board);
+        List<ValidationResult> results = engine.verifySequential();
+
+        if (results.isEmpty()) {
             System.out.println("VALID");
         } else {
             System.out.println("INVALID");
-            print(dups,"ROW");
-            System.out.println("------------------------------------------");
-            print(dups,"COL");
-            System.out.println("------------------------------------------");
-            print(dups,"BOX");
+            printGrouped(results);
         }
     }
 
-  private void print(List<DuplicateInfo> list, String type) {
-    for (DuplicateInfo d : list) {
-        if (d.type.equals(type)) {
-            System.out.print(type + " " + d.index + ", #" + d.value + ", [");
-            for (int i = 0; i < d.positions.length; i++) {
-                System.out.print(d.positions[i]);
-                if (i < d.positions.length - 1) System.out.print(", ");
+    private static void printGrouped(List<ValidationResult> results) {
+        // Print rows
+        System.out.println("Row Duplicates:");
+        for (int i = 1; i <= 9; i++) {
+            for (ValidationResult vr : results) {
+                if (vr.getRegionType() == RegionType.ROW && vr.getRegionIndex() == i) {
+                    System.out.println(vr.formatForOutput());
+                }
             }
-            System.out.println("]");
+        }
+        System.out.println("------------------------------------------");
+
+        // Print columns
+        System.out.println("Column Duplicates:");
+        for (int i = 1; i <= 9; i++) {
+            for (ValidationResult vr : results) {
+                if (vr.getRegionType() == RegionType.COL && vr.getRegionIndex() == i) {
+                    System.out.println(vr.formatForOutput());
+                }
+            }
+        }
+        System.out.println("------------------------------------------");
+
+        // Print boxes
+        System.out.println("Box Duplicates:");
+        for (int i = 1; i <= 9; i++) {
+            for (ValidationResult vr : results) {
+                if (vr.getRegionType() == RegionType.BOX && vr.getRegionIndex() == i) {
+                    System.out.println(vr.formatForOutput());
+                }
+            }
         }
     }
-}
-
-
 }

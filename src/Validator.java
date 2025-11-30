@@ -1,4 +1,5 @@
+import java.util.List;
 
-public interface Validator extends Runnable {
-    void validate();
+public interface Validator {
+    List<ValidationResult> validate();
 }
