@@ -1,0 +1,3 @@
+javac *.java
+jar cfe SudokuVerifier.jar SudokuVerifier *.class
+java -jar SudokuVerifier.jar board.csv 27
