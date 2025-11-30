@@ -2,7 +2,7 @@ import java.util.*;
 
 public class ColValidator implements Validator {
     private final int[][] board;
-    private final int col; // 0-based
+    private final int col; 
 
     public ColValidator(int[][] board, int col) {
         this.board = board;
@@ -14,7 +14,7 @@ public class ColValidator implements Validator {
         Map<Integer, List<Integer>> positions = new HashMap<>();
         for (int r = 0; r < 9; ++r) {
             int v = board[r][col];
-            positions.computeIfAbsent(v, k -> new ArrayList<>()).add(r + 1); // rows 1-based
+            positions.computeIfAbsent(v, k -> new ArrayList<>()).add(r + 1); 
         }
         List<ValidationResult> res = new ArrayList<>();
         for (Map.Entry<Integer, List<Integer>> e : positions.entrySet()) {

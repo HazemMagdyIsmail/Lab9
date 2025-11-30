@@ -3,13 +3,13 @@ import java.nio.file.*;
 import java.util.*;
 
 public class CSVReader {
-    // Reads a 9x9 board from the given file. Accepts CSV or space-separated or mixed.
+  
     public static int[][] readBoard(String path) throws IOException {
         List<String> lines = Files.readAllLines(Paths.get(path));
         List<int[]> rows = new ArrayList<>();
         for (String raw : lines) {
             if (raw.trim().isEmpty()) continue;
-            // split by commas or whitespace
+            
             String[] tokens = raw.trim().split("[,\\s]+");
             if (tokens.length != 9) {
                 throw new IOException("Each row must have 9 numbers. Offending line: " + raw);
