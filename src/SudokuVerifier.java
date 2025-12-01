@@ -17,14 +17,14 @@ public class SudokuVerifier {
         List<Thread> threads = new ArrayList<>();
 
         if (mode == 0) {
-            // Sequential run on main thread
+           
             for (int i = 0; i < 9; i++) {
                 ValidatorFactory.createRowValidator(board, dups, i).run();
                 ValidatorFactory.createColValidator(board, dups, i).run();
                 ValidatorFactory.createBoxValidator(board, dups, i).run();
             }
         } else if (mode == 3) {
-            // 3 threads: one for rows, one for cols, one for boxes
+            
             Thread rowThread = new Thread(() -> {
                 for (int i = 0; i < 9; i++)
                     ValidatorFactory.createRowValidator(board, dups, i).run();
@@ -45,7 +45,7 @@ public class SudokuVerifier {
             for (Thread t : threads) t.start();
             for (Thread t : threads) t.join();
         } else if (mode == 27) {
-            // 27 threads: one per each row/col/box validator
+            
             for (int i = 0; i < 9; i++) {
                 threads.add(new Thread(ValidatorFactory.createRowValidator(board, dups, i)));
                 threads.add(new Thread(ValidatorFactory.createColValidator(board, dups, i)));
@@ -68,7 +68,7 @@ public class SudokuVerifier {
     }
 private void printDuplicates(List<DuplicateInfo> dups, RegionType regionType) {
     for (DuplicateInfo d : dups) {
-        if (d.getRegionType() == regionType) {  // compare enums by ==
+        if (d.getRegionType() == regionType) {  
             System.out.print(regionType.name() + " " + d.getIndex() + ", #" + d.getValue() + ", [");
             int[] positions = d.getPositions();
             for (int i = 0; i < positions.length; i++) {

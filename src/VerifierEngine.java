@@ -15,14 +15,14 @@ public class VerifierEngine {
         List<Thread> threads = new ArrayList<>();
 
         if (mode == 0) {
-            // Sequential validation
+           
             for (int i = 0; i < 9; i++) {
                 ValidatorFactory.createRowValidator(board, duplicates, i).run();
                 ValidatorFactory.createColValidator(board, duplicates, i).run();
                 ValidatorFactory.createBoxValidator(board, duplicates, i).run();
             }
         } else if (mode == 3) {
-            // Three threads: one for rows, one for cols, one for boxes
+            
             Thread rowThread = new Thread(() -> {
                 for (int i = 0; i < 9; i++)
                     ValidatorFactory.createRowValidator(board, duplicates, i).run();
@@ -44,7 +44,7 @@ public class VerifierEngine {
             for (Thread t : threads) t.join();
 
         } else if (mode == 27) {
-            // 27 threads: one per row, col, box validator
+            
             for (int i = 0; i < 9; i++) {
                 threads.add(new Thread(ValidatorFactory.createRowValidator(board, duplicates, i)));
                 threads.add(new Thread(ValidatorFactory.createColValidator(board, duplicates, i)));
